@@ -317,7 +317,8 @@
 	            // Transfer picture to server
 	            var ft = new FileTransfer();
 	            	                      
-	            
+	            //origin image : imageURI
+	            //gray-scale image : "/mnt/sdcard/ntufrs/tmp.jpg" 
 	            ft.upload(imageURI,uploadURL, function(r) {
 	                //alert("upload Successful! Waiting for result...");
 	                window.clearInterval(timeIntervalId);
