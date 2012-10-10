@@ -1,7 +1,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="csie.ntu.foodRec.client"
-    android:versionCode="72"
-    android:versionName="0.72 100912" >
+    android:versionCode="73"
+    android:versionName="0.73 101012" >
 
     <uses-sdk
         android:minSdkVersion="8"

@@ -15,7 +15,10 @@
 		 var device_uuid = "";
     	 var pictureSource;   
     	 var destinationType;
-    	 var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_shane/";  
+    	 //server for color image
+    	 var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_shane/";
+    	 //server for gray-scale image
+    	 //var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_1010/";  
     	 var resultURL = "";    	
          var uploadURL = serverURL+"upload.php"
          var uploadURL_RGB_feature = serverURL+"upload_RGB_feature.php"
@@ -283,7 +286,7 @@
 	            // Transfer picture to server
 	            var ft = new FileTransfer();
 	             
-	            ft.upload(fileURI,uploadURL, function(r) {
+	            ft.upload(fileURI,uploadURL_RGB_feature, function(r) {
 	                
 	                uploadPicture(imageURI);
 	                       		        		                    	
@@ -304,8 +307,8 @@
 	
 	        	if (uploadURL) {
 	        	
-	        	//uploading progress...
-				mainString.innerText="Server side processing";
+	        	//uploading image...
+				mainString.innerText="Uploading image and Server side processing";
 	        	
 	            // Specify transfer options
 	            var options = new FileUploadOptions();
@@ -324,8 +327,8 @@
 	                window.clearInterval(timeIntervalId);
 	                counter= 0 ;
 	                
-	        		//downloading progress...        		
-					mainString.innerText="Downloading result";
+	        		//Waiting for result.txt...        		
+					mainString.innerText="Waiting for result";
 					timeIntervalId = window.setInterval ( "onload1()", timerInterval );
 					runTest();	               
 	                       		        		                    	
@@ -345,9 +348,7 @@
 		function downloadResult(){	
 			
 			var ft2 = new FileTransfer();    		
-									 
-			//begin to download
-			//result_url也要改成uuid
+									
 			
 			ft2.download(serverURL+"forbat/tmp/"+device_uuid+"/result.txt",filePath+device_uuid+"_result.txt",
     		function(entry) {        		
