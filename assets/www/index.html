@@ -228,11 +228,13 @@
 	        	var img = document.getElementById('smallImage');
 				
 	        	var imageURI = img.src;
-	        	var fileURI = "/mnt/sdcard/ntufrs/RGB_feature.txt";
+	        	var fileURI = "/sdcard/ntufrs/RGB_feature.txt";
+	        	//var imageURI = "/mnt/sdcard/ntufrs/tmp.jpg";
+	        	//var fileURI = img.src;
 	        	
 	        	//Get fileEntry from URI and made a copy to our app directory 
-	        	var parent = '/mnt/sdcard/ntufrs/', 
-   				parentEntry = new DirectoryEntry('ntufrs',parent);
+	        	var parent = '/sdcard/ntufrs/';
+   				var parentEntry = new DirectoryEntry('ntufrs',parent);
 	        	
 	        	window.resolveLocalFileSystemURI(imageURI,
 	        		function(fileEntry){
@@ -296,7 +298,8 @@
 	                alert("upload Failed!");
 	                mainString.innerText = "upload Failed!";
 	                // 確保完整流程flag關閉
-	                identifyingFlag = 0;                                    	
+	                identifyingFlag = 0;
+	                spin_stop();                                    	
 	            }, options);
 	        	}
         	
@@ -659,11 +662,11 @@
 	<!-- /content區 -->
 	<div data-role="content">
 		<p style="font-size:large;">NTU Food Recognition System</p>
-		<p style="font-size:medium;">ver 0.73 101012</p>
+		<p style="font-size:medium;">ver 0.75 101512</p>
 		<hr>
 		<div class=out style='text-align:center'>
 		<i></i>
-			<img style="display:none; width:90% ;height:50%;" id="smallImage" onload="resize('smallImage')"  />
+			<img style="display:none;" id="smallImage" onload="resize('smallImage')"  />
 		</div>
 		<p style="font-size:large;" id = "mainString">Take a picture by camera or from album!</p>
 		<div id="spin">  

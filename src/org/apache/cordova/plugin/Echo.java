@@ -1,6 +1,7 @@
 package org.apache.cordova.plugin;
 
 import java.io.FileOutputStream;
+import java.io.OutputStream;
 
 import org.apache.cordova.api.Plugin;
 import org.apache.cordova.api.PluginResult;
@@ -75,7 +76,21 @@ public class Echo extends Plugin {
     			//dst.setPixel(x, y, Color.RED);
     		}    		
     	}
-    	    	
+    	
+    	//Save file
+    	String Hist = "123";
+    	try{
+    	byte buf[] = Hist.getBytes(); 
+    	OutputStream f0 = new FileOutputStream("/sdcard/ntufrs/RGB_feature.txt"); 
+    	for (int i=0; i < buf.length; i ++) { 
+    	f0.write(buf[i]); 
+    	} 
+    	f0.close(); 
+    	}catch(Exception e){
+    	e.printStackTrace();
+
+    	}
+    	
         //Save image
         try {
             FileOutputStream out = new FileOutputStream("/sdcard/ntufrs/tmp.jpg");
