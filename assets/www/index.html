@@ -295,8 +295,8 @@
 	            }, function(error) {
 	            	window.clearInterval(timeIntervalId);
 	            	counter = 0;
-	                alert("upload Failed!");
-	                mainString.innerText = "upload Failed!";
+	                alert("RGB feature file upload Failed!");
+	                mainString.innerText = "RGB feature file upload Failed!";
 	                // 確保完整流程flag關閉
 	                identifyingFlag = 0;
 	                spin_stop();                                    	
@@ -338,10 +338,11 @@
 	            }, function(error) {
 	            	window.clearInterval(timeIntervalId);
 	            	counter = 0;
-	                alert("upload Failed!");
-	                mainString.innerText = "upload Failed!";
+	                alert("image upload Failed!");
+	                mainString.innerText = "image upload Failed!";
 	                // 確保完整流程flag關閉
-	                identifyingFlag = 0;                                                     	
+	                identifyingFlag = 0;
+	                spin_stop();                                                     	
 	            }, options);
 	        	}
         	
@@ -395,18 +396,6 @@
         	
     	 }
 		
-		/* old version
-		function fileReaderSuccess(file){
-			 var reader = new FileReader();
-    		 reader.onload = function(evt) {
-    		 	//alert("read successful");        	 	
-        	 	//alert("This food is : "+reader.result +" . Enjoy it!");
-        	 	mainString.innerText=reader.result;      	 	
-    		 };
-    		 
-    		 reader.readAsText(file);   		 
-		}
-		*/
 		function resetScreen()
 		{
 			 var top1name = document.getElementById('food_header_1');
