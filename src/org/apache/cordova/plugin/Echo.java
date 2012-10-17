@@ -12,6 +12,7 @@ import org.json.JSONObject;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.os.Environment;
 import android.widget.Toast;
 
 
@@ -53,16 +54,28 @@ public class Echo extends Plugin {
     public void imageProcessing(){
     	    	
     	//Load image by BitmapFactory
-    	Bitmap src = BitmapFactory.decodeFile("/sdcard/ntufrs/tmp.jpg");
-    	Bitmap dst;
+    	//Bitmap src = BitmapFactory.decodeFile("/sdcard/ntufrs/tmp.jpg");
+    	Bitmap src = BitmapFactory.decodeFile(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ntufrs/tmp.jpg");
+    	Bitmap dst;    	
     	
     	//Make a mutable copy
     	//First thing is to made a scale copy, avoiding memory leak
-    	if(src.getHeight() > 300 && src.getWidth() > 300){
-    		float dstHeight = (float)src.getHeight()*((float)300/(float)src.getWidth());
-        	
-        	dst = Bitmap.createScaledBitmap(src, 300, (int)dstHeight, false);
-        	dst = dst.copy(Bitmap.Config.ARGB_8888, true);
+    	if(src.getHeight() > 300 || src.getWidth() > 300){
+    		
+    		if(src.getWidth() > src.getHeight()){
+    			float dstHeight = (float)src.getHeight()*((float)300/(float)src.getWidth());
+            	
+            	dst = Bitmap.createScaledBitmap(src, 300, (int)dstHeight, false);
+            	dst = dst.copy(Bitmap.Config.ARGB_8888, true);
+    		}else{
+    			
+    			float dstWidth = (float)src.getWidth()*((float)300/(float)src.getHeight());
+            	
+            	dst = Bitmap.createScaledBitmap(src, (int)dstWidth ,300, false);
+            	dst = dst.copy(Bitmap.Config.ARGB_8888, true);
+    			
+    		}
+    		
         	
     	}else{
     		
@@ -77,24 +90,64 @@ public class Echo extends Plugin {
     		}    		
     	}
     	
-    	//Save file
+    	/*
+    	//Save RGB feature file
     	String Hist = "123";
     	try{
-    	byte buf[] = Hist.getBytes(); 
-    	OutputStream f0 = new FileOutputStream("/sdcard/ntufrs/RGB_feature.txt"); 
-    	for (int i=0; i < buf.length; i ++) { 
-    	f0.write(buf[i]); 
-    	} 
-    	f0.close(); 
+    		byte buf[] = Hist.getBytes(); 
+    		OutputStream f0 = new FileOutputStream("/sdcard/ntufrs/RGB_feature.txt"); 
+    		for (int i=0; i < buf.length; i ++) { 
+    			f0.write(buf[i]); 
+    		} 
+    		f0.close(); 
     	}catch(Exception e){
-    	e.printStackTrace();
-
+    		e.printStackTrace();
     	}
+    	*/
+    	
+    	// Gray-scale image 
+    	int w = dst.getWidth();
+    	int h = dst.getHeight();
+    			
+    	int[] pix = new int[w * h]; 
+    	dst.getPixels(pix, 0, w, 0, 0, w, h); 
+
+    	int alpha=0xFF<<24; 
+    	for (int i = 0; i < h; i++) { 
+    		for (int j = 0; j < w; j++) {  
+    			int color = pix[w * i + j]; 
+    			int red = ((color & 0x00FF0000) >> 16); 
+    			int green = ((color & 0x0000FF00) >> 8); 
+    			int blue = color & 0x000000FF;
+    			//Naive weighting
+    			//color = (red + green + blue)/3;
+    			//Matlab weighting
+    			float tmp = (float)red;
+    			int new_red = (int)(0.299*tmp);
+    			tmp  = (float)green;
+    			int new_green = (int)(0.587*tmp);
+    			tmp = (float)blue;
+    			int new_blue = (int)(0.114*tmp);
+    			color = new_red+new_green+new_blue;
+    					
+    			color = alpha | (color << 16) | (color << 8 )| color; 
+    			pix[w * i + j] = color; 
+    	} 
+    	} 
+    	Bitmap grayBitmap=Bitmap.createBitmap(w, h, Bitmap.Config.ARGB_8888); 
+    	grayBitmap.setPixels(pix, 0, w, 0, 0,w, h);
+    	
     	
         //Save image
         try {
-            FileOutputStream out = new FileOutputStream("/sdcard/ntufrs/tmp.jpg");
-            dst.compress(Bitmap.CompressFormat.JPEG, 100, out);
+        	//Environment.getExternalStorageDirectory().getPath();
+            //FileOutputStream out = new FileOutputStream("/sdcard/ntufrs/tmp.jpg");
+        	FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ntufrs/tmp.jpg");
+            //RGB
+            //dst.compress(Bitmap.CompressFormat.JPEG, 100, out);
+            //Grayscale
+            grayBitmap.compress(Bitmap.CompressFormat.JPEG, 75, out);
+            
         } catch (Exception e) {
         	
             e.printStackTrace();
@@ -103,4 +156,7 @@ public class Echo extends Plugin {
         
     	
     }
+
+    
+
 }

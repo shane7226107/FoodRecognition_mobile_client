@@ -16,9 +16,9 @@
     	 var pictureSource;   
     	 var destinationType;
     	 //server for color image
-    	 var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_shane/";
+    	 //var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_shane/";
     	 //server for gray-scale image
-    	 //var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_1010/";  
+    	 var serverURL = "http://cml18.csie.ntu.edu.tw/~larry61410/server_1010/";  
     	 var resultURL = "";    	
          var uploadURL = serverURL+"upload.php"
          var uploadURL_RGB_feature = serverURL+"upload_RGB_feature.php"
@@ -216,7 +216,9 @@
    		 	if(identifyingFlag == 0){
     		    
     		    alert("This may take a while,please wait...");
-    		    
+    		    	
+	        	resetScreen();
+	        	
     		    //Image pre-processing...
 	        	mainString.innerText="Image pre-processing";
     		    		
@@ -227,22 +229,27 @@
 	    		// Get URI of picture to upload
 	        	var img = document.getElementById('smallImage');
 				
+				//Image URI from album or camera
 	        	var imageURI = img.src;
-	        	var fileURI = "/sdcard/ntufrs/RGB_feature.txt";
-	        	//var imageURI = "/mnt/sdcard/ntufrs/tmp.jpg";
-	        	//var fileURI = img.src;
+	    	
+	        	//RGB feature file
+	        	var RGB_file_URI = "/sdcard/ntufrs/RGB_feature.txt";
+	        	//Upload Image file
+	        	var gray_image_URI = "/sdcard/ntufrs/tmp.jpg";
 	        	
 	        	//Get fileEntry from URI and made a copy to our app directory 
 	        	var parent = '/sdcard/ntufrs/';
    				var parentEntry = new DirectoryEntry('ntufrs',parent);
-	        	
+	      		
+	      		//將imageURI解為local file system path : FileEntry
 	        	window.resolveLocalFileSystemURI(imageURI,
-	        		function(fileEntry){
+	        		//將FileEntry移到/sdcard/ntufrs/
+	        		function(fileEntry){//fileEntry = 解析後的檔案指標
 	        			//alert(fileEntry.fullPath);
 	        			fileEntry.copyTo(parentEntry,
 	        				'tmp.jpg',
-	        				function(entry){
-	        					/*alert('Success');*/
+	        				function(entry){//entry = 複製到目標後的檔案指標
+	        					//alert('Success');
 	        					//Successful callback : image pre-processing
 	        					window.echo("echome", function(echoValue) {
     							//alert(echoValue == "echome"); // should alert true.
@@ -250,13 +257,23 @@
     							//alert(""+entry.toURL());
     							//Successful callback : upload image
     							//uploadPicture(entry.toURL());
-    							upload_RGB_feature(imageURI,fileURI);			
+    							
+    							upload_RGB_feature(entry.toURL(),RGB_file_URI);		
+    								
 								});
 	        				},
-	        				function(e){alert('failed : '+ e.toString());}
+	        				function(e){
+	        						alert('failed : '+ e.toString());
+	        						identifyingFlag = 1;
+	    	    					spin_start();
+	        				}
 	        				);
 	        		}, 
-	        		function(e){alert('URI to FileEntry failed');}
+	        		function(e){
+	        			alert('URI to FileEntry failed');
+	        			identifyingFlag = 0;
+	    	    		spin_stop();
+	        		}
 	        	);
 	        	
 	        	
@@ -270,10 +287,7 @@
    		 function upload_RGB_feature(imageURI,fileURI) {
 	
 	        	if (uploadURL_RGB_feature) {
-	        	
-	        	//secondString.innerText= uploadURL;	
-	        	resetScreen();
-	        	
+	        
 	        	//uploading progress...
 	        	mainString.innerText="Uploading RGB feature file";
 				timeIntervalId = window.setInterval ( "onload1()", timerInterval );
@@ -323,7 +337,7 @@
 	            // Transfer picture to server
 	            var ft = new FileTransfer();
 	            	                      
-	            //origin image : imageURI
+	            //origin image : imageUR
 	            //gray-scale image : "/mnt/sdcard/ntufrs/tmp.jpg" 
 	            ft.upload(imageURI,uploadURL, function(r) {
 	                //alert("upload Successful! Waiting for result...");
