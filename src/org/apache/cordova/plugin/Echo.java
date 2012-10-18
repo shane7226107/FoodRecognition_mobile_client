@@ -83,31 +83,80 @@ public class Echo extends Plugin {
     		
     	}
     	        
-        //Manipulate
-    	for (int y=0 ; y < dst.getHeight() ; y ++){
-    		for(int x = 0 ; x < dst.getWidth() ; x++){
-    			//dst.setPixel(x, y, Color.RED);
-    		}    		
+ 
+    	
+    	int w=dst.getWidth(),h=dst.getHeight();  
+    	String Hist = "";
+    	
+    	// RGBHistogram 
+    	int nBins = 16;
+    	int patchNum = 16;
+    	float [][] desc = new float [patchNum][nBins*6];
+    	int [] rhist = new int [nBins];
+    	int [] ghist = new int [nBins];
+    	int [] bhist = new int [nBins];
+    	int patchWlen = w/4+1;
+    	int patchHlen = h/4+1;
+    	int pixel;
+    	
+    	for(int i =0;i<nBins;i++)
+    		rhist[i]=ghist[i]=bhist[i] = 0;
+    	int r=0,g=0,b = 0;
+    	int sizePatchW,sizePatchH,indexPatchW,indexPatchH,patchID; 
+    	float [] hsv = new float [3];
+    	int []int_hsv = new int [3];
+    	for(int i=0;i<h;i++)
+    	{
+    		for(int j=0;j<w;j++)
+    		{
+    			pixel = dst.getPixel(j, i);
+    			 r = Color.red(pixel);
+    			 g = Color.green(pixel);
+    			 b = Color.blue(pixel);
+    			 Color.RGBToHSV(r, g, b, hsv);
+    			 sizePatchH = (indexPatchH= i / patchHlen)==3?h%patchHlen:patchHlen;
+    			sizePatchW = (indexPatchW= j / patchWlen)==3?w%patchWlen:patchWlen;
+    			patchID = indexPatchH*4+indexPatchW;
+    			
+    			for(int k = 0;k<3;k++)
+    				int_hsv[k] = (int)hsv[k];
+    			
+    			float tmpPix = 1 / (float)(sizePatchH*sizePatchW);
+    			desc[patchID][r/nBins] =desc[patchID][r/nBins]+tmpPix;
+    			desc[patchID][16+g/nBins]=desc[patchID][16+g/nBins]+tmpPix;
+    			desc[patchID][32+b/nBins]=desc[patchID][32+b/nBins]+tmpPix;
+    		    
+    			desc[patchID][48+(int)(hsv[0]/22.6)] =desc[patchID][48+(int)(hsv[0]/22.6)]+tmpPix;
+    			desc[patchID][64+(int)(hsv[1]*(nBins-1))] =desc[patchID][64+(int)(hsv[1]*(nBins-1))]+tmpPix;
+    			desc[patchID][80+(int)(hsv[2]*(nBins-1))] =desc[patchID][80+(int)(hsv[2]*(nBins-1))]+tmpPix;
+    			
+    		}
     	}
     	
-    	/*
-    	//Save RGB feature file
-    	String Hist = "123";
+    	Hist = "1 ";
+    	for (int i = 0;i<patchNum;i++)
+    		for(int j = 0;j<nBins*6;j++)
+    			Hist = Hist + (int)(i*nBins*6+j+1) +":" +(float)(Math.round((double)desc[i][j]*1000000)/1000000.00)+" ";
+    	Hist = Hist + "\n";
+    	
+    	
+    	//Save Color feature file
+    	//Hist = "123";
     	try{
     		byte buf[] = Hist.getBytes(); 
-    		OutputStream f0 = new FileOutputStream("/sdcard/ntufrs/RGB_feature.txt"); 
-    		for (int i=0; i < buf.length; i ++) { 
+    		OutputStream f0 = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ntufrs/RGB_feature.txt"); 
+    		for (int i=0; i < buf.length; i++) { 
     			f0.write(buf[i]); 
     		} 
     		f0.close(); 
     	}catch(Exception e){
     		e.printStackTrace();
+
     	}
-    	*/
     	
     	// Gray-scale image 
-    	int w = dst.getWidth();
-    	int h = dst.getHeight();
+    	w = dst.getWidth();
+    	h = dst.getHeight();
     			
     	int[] pix = new int[w * h]; 
     	dst.getPixels(pix, 0, w, 0, 0, w, h); 
@@ -140,7 +189,7 @@ public class Echo extends Plugin {
     	
         //Save image
         try {
-        	//Environment.getExternalStorageDirectory().getPath();
+        	
             //FileOutputStream out = new FileOutputStream("/sdcard/ntufrs/tmp.jpg");
         	FileOutputStream out = new FileOutputStream(Environment.getExternalStorageDirectory().getAbsolutePath()+"/ntufrs/tmp.jpg");
             //RGB
